@@ -1,121 +1,165 @@
-class Juego{
-    constructor(indice,nombre,id,precio){
-        this.indice=indice,
-        this.nombre=nombre,
-        this.id=id,
-        this.precio=precio
+class Juego {
+    constructor(indice, nombre, id, precio, imagen) {
+            this.indice = indice,
+            this.nombre = nombre,
+            this.id = id,
+            this.precio = precio,
+            this.imagen = imagen
     }
 }
-class Cliente{
-    constructor(nombre,edad,juegos,total){
-        this.nombre=nombre;
-        this.edad=edad;
-        this.juegos=juegos;
-        this.total=total
+
+class ProductoController {
+
+    constructor() {
+        this.listaProductosFila1 = [],
+            this.listaProductosFila2 = [],
+            this.fila1 = document.getElementById("fila1"),
+            this.fila2 = document.getElementById("fila2")
+    }
+
+    cargarProductos() {
+
+        this.listaProductosFila1 = 
+        [new Juego("a", "God of War".toLowerCase(), 1, 7000, "./assets/juego1.webp"),
+        new Juego("b", "Uncharted".toLowerCase(), 2, 8000, "./assets/Juego2.jpg"),
+        new Juego("c", "Control".toLowerCase(), 3, 6000, "./assets/Juego3.jpg"),]
+
+        this.listaProductosFila2 = 
+        [new Juego("d", "Modern Warfare".toLowerCase(), 4, 9000, "./assets/Juego4.avif"),
+        new Juego("e", "Ghost".toLowerCase(), 5, 10000, "./assets/Juego 5.jpg"),
+        new Juego("f", "Farcry".toLowerCase(), 6, 5000, "./assets/Juego6.jpg")]
+
+    }
+
+    mostrarEnDom() {
+        //CARGA DE JUEGOS EN LA FILA 1
+        this.listaProductosFila1.forEach(element => {
+            this.fila1.innerHTML += `<div class="card" style="width: 18rem;">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${element.nombre}</h5>
+                                            <img src="${element.imagen}" alt="">
+                                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of
+                                            the card's content.</p>
+                                            <p>Precio: ${element.precio}</p>
+                                            <p>Id: ${element.id}</p>
+                                            <a href="#" class="btn btn-primary boton" id="juego_${element.id}"><img src="./assets/carrito3.png" class="imagen" alt=""></a>
+                                        </div>
+                                    </div>`
+        })
+        //CARGA DE JUEGOS EN LA FILA 2
+        this.listaProductosFila2.forEach(element => {
+            this.fila2.innerHTML += `<div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">${element.nombre}</h5>
+                                <img src="${element.imagen}" alt="">
+                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of
+                                the card's content.</p>
+                                <p>Precio: ${element.precio}</p>
+                                <p>Id: ${element.id}</p>
+                                <a href="#" class="btn btn-primary boton" id="juego_${element.id}"><img src="./assets/carrito3.png" class="imagen" alt=""></a>
+                            </div>
+                        </div>`
+        })
+    }
+
+    darEventos(controladorCarrito) {
+        this.listaProductosFila1.forEach(el => {
+            const btnJuego = document.getElementById(`juego_${el.id}`)
+            btnJuego.addEventListener("click", () => {
+                controladorCarrito.agregarProducto(el)
+                controladorCarrito.limpiarDom()
+                controladorCarrito.listaCarrito.forEach(el => {
+                    controladorCarrito.contenedorCarrito.innerHTML +=
+                        `<div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">${el.nombre}</h5>
+                                <img src="${el.imagen}" alt="">
+                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of
+                                the card's content.</p>
+                                <p>Precio: ${el.precio}</p>
+                                <p>Id: ${el.id}</p>
+                                <a href="#" class="btn btn-primary boton" id="juego_${el.id}"><img src="./assets/carrito3.png" class="imagen" alt=""></a>
+                            </div>
+                        </div>`
+                    guardarLocal("listaCarrito", JSON.stringify(controladorCarrito.listaCarrito))
+                })
+            })
+        })
+
+        this.listaProductosFila2.forEach(el => {
+            const btnJuego = document.getElementById(`juego_${el.id}`)
+            btnJuego.addEventListener("click", () => {
+                controladorCarrito.agregarProducto(el)
+                controladorCarrito.limpiarDom()
+                controladorCarrito.listaCarrito.forEach(el => {
+                    controladorCarrito.contenedorCarrito.innerHTML +=
+                        `<div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">${el.nombre}</h5>
+                                <img src="${el.imagen}" alt="">
+                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of
+                                the card's content.</p>
+                                <p>Precio: ${el.precio}</p>
+                                <p>Id: ${el.id}</p>
+                            </div>
+                        </div>`
+                    guardarLocal("listaCarrito", JSON.stringify(controladorCarrito.listaCarrito))
+                })
+            })
+        })
     }
 }
-class ListaPersonas{
-    constructor(){
-        this.listaPersonas=[]
+
+class CarritoController {
+
+    constructor() {
+        this.listaCarrito = []
+        this.contenedorCarrito = document.getElementById("modal")
     }
-
-    agregar(juegos,nom,edad,promo){
-        let total=0
-        const miObjeto={};
-        let juegos2=[]
-        juegos.forEach(element => {
-                juegos2.push(element.nombre)
-                total+=element.precio
-        });
-        for (let index = 0; index < juegos.length; index++) {
-            miObjeto[index]=juegos2[index]
+    "v"
+    verificarExistenciaEnStorage() {
+        const vectorDeStorage= (JSON.parse(localStorage.getItem("listaCarrito"))) || []
+        this.listaCarrito = [...vectorDeStorage]
+        if (this.listaCarrito.length > 0) {
+            this.contenedorCarrito.innerHTML = ``
+            this.listaCarrito.forEach(el => {
+                this.contenedorCarrito.innerHTML+=
+                    `<div class="card" style="width: 18rem;">
+                        <div class="card-body">
+                            <h5 class="card-title">${el.nombre}</h5>
+                            <img src="${el.imagen}" alt="">
+                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of
+                            the card's content.</p>
+                            <p>Precio: ${el.precio}</p>
+                            <p>Id: ${el.id}</p>
+                        </div>
+                    </div>`
+        })
         }
-
-        this.listaPersonas.push(new Cliente(nom,edad,miObjeto,this.calcularTotal(total,promo)))
-        
     }
-
-    calcularTotal(total,promo){
-        if(promo=="si"){
-            total=total-(total*0.1)
-        }
-        return total
+    agregarProducto(producto) {
+        this.listaCarrito.push(producto)
+    }
+    limpiarDom() {
+        this.contenedorCarrito.innerHTML = ""
     }
     
-    buscarPersona(buscado){
-        const resultado=this.listaPersonas.find((el)=>el.nombre==buscado)
-        return resultado
-    }
+    
 }
 
-const listaJuegos=[
-                    new Juego("a","God of War".toLowerCase(),1,7000),
-                    new Juego("b","Fifa 23".toLowerCase(),2,8000),
-                    new Juego("c","Hogwarts Legacy".toLowerCase(),3,6000),
-                    new Juego("d","The witcher".toLowerCase(),4,9000),
-                    new Juego("e","Spiderman".toLowerCase(),5,10000),
-                    new Juego("f","Zelda".toLowerCase(),6,5000),
-                  ]
+const controladorProducto = new ProductoController()
+const controladorCarrito = new CarritoController()
 
-const listaPersona=new ListaPersonas()
-let rta=""
-let buscado=""
-let rta2=""
+controladorProducto.cargarProductos()
+controladorProducto.mostrarEnDom()
+controladorProducto.darEventos(controladorCarrito)
+controladorCarrito.verificarExistenciaEnStorage()
 
-do{
-    rta=prompt("Indique la opcion que desea: \na) Ver el catalogo \nb) Buscar un juego")
-    switch(rta){
-        case "a":
-            let juego=""
-            const juegos=[]
-            let acumulador=""
-            listaJuegos.forEach(element=>{acumulador+=element.indice+") "+" nombre: "+element.nombre+"/ id: "+element.id+"/ precio: "+element.precio+"\n"})
+const guardarLocal = (clave, valor) => {
+    localStorage.setItem(clave, valor);
+}
 
-            do{
-                juego=prompt("Indique el juego que desea: \n".toLowerCase()+acumulador)
-                juegos.push(listaJuegos.find(el=>el.indice==juego))
-                rta2=prompt("¿Desea elegir otro juego? (si/no)".toLowerCase())
-            }while(rta2!="no")
 
-            let nom=prompt("Ingrese su nombre")
-            console.log("Bienvenido/a: "+nom);
-            let edad=Number(prompt("Indique su edad"))
-            let promo=""
 
-            do{
-                promo=prompt("¿Es usted socio de JuegosPlus? (si/no)").toLowerCase()
-            }while((promo!="si")&&(promo!="no"))
 
-            listaPersona.agregar(juegos,nom,edad,promo)
 
-            break;
-
-        case "b":
-            let resultado
-            do{
-                buscado=prompt("Ingrese el nombre de un juego para buscarlo")
-                resultado=listaJuegos.find(el=>el.nombre==buscado)
-                if(resultado==undefined){
-                    alert("No existe tal juego");
-                }
-                else{
-                    alert("Nombre: "+resultado.nombre+"/ id: "+resultado.id+"/ precio: "+resultado.precio);
-                }
-                rta2=prompt("¿Desea buscar otro juego?".toLowerCase())
-            }while(rta2!="no")
-
-            break;
-
-    }
-            
-    rta2=prompt("¿Desea seguir con el programa? (si/no)").toLowerCase()
-
-}while(rta2!="no")
-
-console.log(listaPersona);
-
-rta2=prompt("¿Desea ver su pedido? (si/no)".toLowerCase())
-    if(rta2=="si"){
-        buscado=prompt("Ingrese su nombre para ver su pedido".toLowerCase())
-        console.log(listaPersona.buscarPersona(buscado))
-    }
