@@ -181,13 +181,3 @@ controladorCarrito.sumaTotalFuncion()
 const guardarLocal = (clave, valor) => {
     localStorage.setItem(clave, valor);
 }
-
-/* `<div class="card" style="width: 18rem;">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title">${element.nombre}</h5>
-                                                        <img src="${element.imagen}" class="imgEnElCarrito" alt="">
-                                                        <p>Precio: ${element.precio}</p>
-                                                        <p>Cantidad: ${element.cantidad}</p>
-                                                        <a href="#" class="btn btn-primary boton btnBorrar" id="borrar_${element.id}">Borrar</a>
-                                                    </div>
-                                               </div>` */
