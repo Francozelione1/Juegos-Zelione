@@ -1,113 +1,70 @@
 class Juego {
-    constructor(indice, nombre, id, precio, imagen) {
-            this.indice = indice,
+    constructor(indice, nombre, id, precio, imagen, cantidad) {
+        this.indice = indice,
             this.nombre = nombre,
             this.id = id,
             this.precio = precio,
-            this.imagen = imagen
+            this.imagen = imagen,
+            this.cantidad = cantidad
+
     }
 }
 
 class ProductoController {
 
     constructor() {
-        this.listaProductosFila1 = [],
-            this.listaProductosFila2 = [],
-            this.fila1 = document.getElementById("fila1"),
-            this.fila2 = document.getElementById("fila2")
+        this.listaProductos = []
+        this.contenedorJuegos = document.getElementById("contenedorJuegos")
     }
 
-    cargarProductos() {
+    async cargarProductos(controladorCarrito) {
+        const response = await fetch('./base.json')
+        let data = await response.json()
 
-        this.listaProductosFila1 = 
-        [new Juego("a", "God of War".toLowerCase(), 1, 7000, "./assets/juego1.webp"),
-        new Juego("b", "Uncharted".toLowerCase(), 2, 8000, "./assets/Juego2.jpg"),
-        new Juego("c", "Control".toLowerCase(), 3, 6000, "./assets/Juego3.jpg"),]
+        data.forEach(element => {
+            this.contenedorJuegos.innerHTML += `<div class="card" ">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">${element.nombre}</h5>
+                                                    <img src="${element.imagen}" class="imagen_juegos" alt="">
+                                                    <p>Precio: ${element.precio}</p>
+                                                    <a href="#" class="btn btn-primary boton" id="juego_${element.id}"><img src="./assets/carrito3.png" class="imagenCarrito" alt=""></a>
+                                                    <a href="#"  id="borrar_${element.id}"></a>
+                                                </div>
+                                            </div>`
 
-        this.listaProductosFila2 = 
-        [new Juego("d", "Modern Warfare".toLowerCase(), 4, 9000, "./assets/Juego4.avif"),
-        new Juego("e", "Ghost".toLowerCase(), 5, 10000, "./assets/Juego 5.jpg"),
-        new Juego("f", "Farcry".toLowerCase(), 6, 5000, "./assets/Juego6.jpg")]
+            this.listaProductos.push(element)
 
+        })
+
+        this.darEventos(controladorCarrito)
     }
 
-    mostrarEnDom() {
-        //CARGA DE JUEGOS EN LA FILA 1
-        this.listaProductosFila1.forEach(element => {
-            this.fila1.innerHTML += `<div class="card" style="width: 18rem;">
-                                        <div class="card-body">
-                                            <h5 class="card-title">${element.nombre}</h5>
-                                            <img src="${element.imagen}" alt="">
-                                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of
-                                            the card's content.</p>
-                                            <p>Precio: ${element.precio}</p>
-                                            <p>Id: ${element.id}</p>
-                                            <a href="#" class="btn btn-primary boton" id="juego_${element.id}"><img src="./assets/carrito3.png" class="imagen" alt=""></a>
-                                        </div>
-                                    </div>`
-        })
-        //CARGA DE JUEGOS EN LA FILA 2
-        this.listaProductosFila2.forEach(element => {
-            this.fila2.innerHTML += `<div class="card" style="width: 18rem;">
-                            <div class="card-body">
-                                <h5 class="card-title">${element.nombre}</h5>
-                                <img src="${element.imagen}" alt="">
-                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of
-                                the card's content.</p>
-                                <p>Precio: ${element.precio}</p>
-                                <p>Id: ${element.id}</p>
-                                <a href="#" class="btn btn-primary boton" id="juego_${element.id}"><img src="./assets/carrito3.png" class="imagen" alt=""></a>
-                            </div>
-                        </div>`
-        })
+    notificacionAgregar(nombre) {
+        Toastify({
+            text: `${nombre} fué añadido`,
+            duration: 1000,
+            gravity: "bottom", // `top` or `bottom`
+            position: "right", // `left`, `center` or `right`
+            close: true
+        }).showToast();
     }
 
     darEventos(controladorCarrito) {
-        this.listaProductosFila1.forEach(el => {
+        this.listaProductos.forEach(el => {
             const btnJuego = document.getElementById(`juego_${el.id}`)
             btnJuego.addEventListener("click", () => {
                 controladorCarrito.agregarProducto(el)
                 controladorCarrito.limpiarDom()
-                controladorCarrito.listaCarrito.forEach(el => {
-                    controladorCarrito.contenedorCarrito.innerHTML +=
-                        `<div class="card" style="width: 18rem;">
-                            <div class="card-body">
-                                <h5 class="card-title">${el.nombre}</h5>
-                                <img src="${el.imagen}" alt="">
-                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of
-                                the card's content.</p>
-                                <p>Precio: ${el.precio}</p>
-                                <p>Id: ${el.id}</p>
-                                <a href="#" class="btn btn-primary boton" id="juego_${el.id}"><img src="./assets/carrito3.png" class="imagen" alt=""></a>
-                            </div>
-                        </div>`
-                    guardarLocal("listaCarrito", JSON.stringify(controladorCarrito.listaCarrito))
-                })
+                controladorCarrito.sumaTotalFuncion()
+                this.notificacionAgregar(el.nombre)
+                controladorCarrito.mostrarEnDom()
+                guardarLocal("listaCarrito", JSON.stringify(controladorCarrito.listaCarrito))
             })
-        })
 
-        this.listaProductosFila2.forEach(el => {
-            const btnJuego = document.getElementById(`juego_${el.id}`)
-            btnJuego.addEventListener("click", () => {
-                controladorCarrito.agregarProducto(el)
-                controladorCarrito.limpiarDom()
-                controladorCarrito.listaCarrito.forEach(el => {
-                    controladorCarrito.contenedorCarrito.innerHTML +=
-                        `<div class="card" style="width: 18rem;">
-                            <div class="card-body">
-                                <h5 class="card-title">${el.nombre}</h5>
-                                <img src="${el.imagen}" alt="">
-                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of
-                                the card's content.</p>
-                                <p>Precio: ${el.precio}</p>
-                                <p>Id: ${el.id}</p>
-                            </div>
-                        </div>`
-                    guardarLocal("listaCarrito", JSON.stringify(controladorCarrito.listaCarrito))
-                })
-            })
         })
     }
+
+
 }
 
 class CarritoController {
@@ -115,51 +72,122 @@ class CarritoController {
     constructor() {
         this.listaCarrito = []
         this.contenedorCarrito = document.getElementById("modal")
+        this.sumaTotal = document.getElementById("sumaTotal")
     }
-    "v"
+
     verificarExistenciaEnStorage() {
-        const vectorDeStorage= (JSON.parse(localStorage.getItem("listaCarrito"))) || []
-        this.listaCarrito = [...vectorDeStorage]
+        this.listaCarrito = JSON.parse(localStorage.getItem("listaCarrito")) || []
         if (this.listaCarrito.length > 0) {
-            this.contenedorCarrito.innerHTML = ``
-            this.listaCarrito.forEach(el => {
-                this.contenedorCarrito.innerHTML+=
-                    `<div class="card" style="width: 18rem;">
-                        <div class="card-body">
-                            <h5 class="card-title">${el.nombre}</h5>
-                            <img src="${el.imagen}" alt="">
-                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of
-                            the card's content.</p>
-                            <p>Precio: ${el.precio}</p>
-                            <p>Id: ${el.id}</p>
-                        </div>
-                    </div>`
-        })
+            this.mostrarEnDom()
         }
     }
+
     agregarProducto(producto) {
-        this.listaCarrito.push(producto)
+        let flag = false
+        for (let index = 0; index < this.listaCarrito.length; index++) {
+            if (this.listaCarrito[index].id == producto.id) {
+                this.listaCarrito[index].cantidad += 1
+                flag = true
+            }
+        }
+        if (flag == false) {
+            this.listaCarrito.push(producto)
+        }
     }
+
     limpiarDom() {
         this.contenedorCarrito.innerHTML = ""
     }
-    
-    
+
+    sumaTotalFuncion() {
+        let total = 0;
+        total = this.listaCarrito.reduce((total, producto) => total + (producto.precio * producto.cantidad), 0) || 0
+        this.sumaTotal.innerHTML = `Total: ${total}`
+    }
+
+    compraFinalizada() {
+        const finalizarCompra = document.getElementById("finalizarCompra")
+        finalizarCompra.addEventListener("click", () => {
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Compra finalizada con exito',
+                showConfirmButton: false,
+                timer: 2000
+            })
+            this.limpiarDom()
+            this.listaCarrito = []
+            localStorage.removeItem("listaCarrito")
+            this.sumaTotal.innerHTML = "Total: 0"
+        })
+    }
+
+    borrarProducto(productoParticular) {
+
+        let pos = this.listaCarrito.findIndex(productos => productoParticular.id == productos.id)
+
+        if (pos != -1) {
+            this.listaCarrito.splice(pos, 1)
+        }
+
+    }
+
+    mostrarEnDom() {
+        this.limpiarDom()
+        this.listaCarrito.forEach(element => {
+            this.contenedorCarrito.innerHTML += `<div class="card mb-3" style="max-width: 540px;">
+                                                    <div class="row g-0">
+                                                        <div class="col-md-4 parteUnoCartaModal">
+                                                            <img src="${element.imagen}" class="img-fluid rounded-start imgModal" alt="...">
+                                                        </div>
+                                                        <div class="col-md-8 parteDosCartaModal">
+                                                            <div class="card-body">
+                                                            <h5 class="card-title">${element.nombre}</h5>
+                                                            <p class="card-text">Precio: ${element.precio}</p>
+                                                            <p class="card-text"><small class="text-body-secondary">Cantidad: ${element.cantidad}</small></p>
+                                                            <a href="#" class="btn btn-primary boton btnBorrar" id="borrar_${element.id}">Borrar</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>`
+        })
+        this.eventoBorrarProducto()
+        this.sumaTotalFuncion()
+    }
+
+    eventoBorrarProducto() {
+        this.listaCarrito.forEach(el => {
+            const botonBorrar = document.getElementById(`borrar_${el.id}`)
+            botonBorrar.addEventListener("click", () => {
+                this.borrarProducto(el)
+                guardarLocal("listaCarrito", JSON.stringify(this.listaCarrito))
+                this.mostrarEnDom()
+            })
+        })
+    }
+
 }
+
 
 const controladorProducto = new ProductoController()
 const controladorCarrito = new CarritoController()
 
-controladorProducto.cargarProductos()
-controladorProducto.mostrarEnDom()
-controladorProducto.darEventos(controladorCarrito)
 controladorCarrito.verificarExistenciaEnStorage()
+controladorProducto.cargarProductos(controladorCarrito)
+controladorCarrito.compraFinalizada()
+controladorCarrito.sumaTotalFuncion()
+
 
 const guardarLocal = (clave, valor) => {
     localStorage.setItem(clave, valor);
 }
 
-
-
-
-
+/* `<div class="card" style="width: 18rem;">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">${element.nombre}</h5>
+                                                        <img src="${element.imagen}" class="imgEnElCarrito" alt="">
+                                                        <p>Precio: ${element.precio}</p>
+                                                        <p>Cantidad: ${element.cantidad}</p>
+                                                        <a href="#" class="btn btn-primary boton btnBorrar" id="borrar_${element.id}">Borrar</a>
+                                                    </div>
+                                               </div>` */
